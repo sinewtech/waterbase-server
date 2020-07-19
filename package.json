@@ -1,0 +1,19 @@
+{
+  "name": "sinebase-server",
+  "version": "0.0.1",
+  "description": "free and open-source BaaS by Sinewave LLC.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sinewtech/sinebase-server.git"
+  },
+  "author": "Sinewave LLC",
+  "license": "GPL-3.0",
+  "bugs": {
+    "url": "https://github.com/sinewtech/sinebase-server/issues"
+  },
+  "homepage": "https://github.com/sinewtech/sinebase-server#readme"
+}
