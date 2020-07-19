@@ -1,15 +1,11 @@
-const { MongoClient } = require('mongodb');
+const mongoose = require('mongoose');
 
 const url = `${process.env.MONGO_URL}:${process.env.MONGO_PORT}/${process.env.MONGO_DB}`;
-let database;
+mongoose.connect(url, {
+  useUnifiedTopology: true,
+  useNewUrlParser: true,
+});
 
-module.exports = function () {
-  return new Promise((resolve, reject) => {
-    if (database) resolve(database);
-    MongoClient.connect(url, { useUnifiedTopology: true }, (err, connection) => {
-      if (err) reject(err);
-      database = connection.db();
-      resolve(database);
-    });
-  });
-};
+const { connection } = mongoose;
+
+module.exports = connection;
