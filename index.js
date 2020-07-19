@@ -7,9 +7,11 @@ const body = require('body-parser');
 const path = require('path');
 const fs = require('fs');
 const Auth = require('./routers/auth');
+const { initDB } = require('./helpers/mongoUtil');
 
 const PORT = process.env.PORT || 3001;
 const app = express();
+initDB();
 
 app.use(cors());
 app.use(body.urlencoded({ extended: true }));

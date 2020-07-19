@@ -1,11 +1,18 @@
 const mongoose = require('mongoose');
 
-const url = `${process.env.MONGO_URL}:${process.env.MONGO_PORT}/${process.env.MONGO_DB}`;
-mongoose.connect(url, {
-  useUnifiedTopology: true,
-  useNewUrlParser: true,
-});
-
+function initDB() {
+  const url = `${process.env.MONGO_URL}:${process.env.MONGO_PORT}/${process.env.MONGO_DB}`;
+  mongoose.connect(
+    url,
+    {
+      useUnifiedTopology: true,
+      useNewUrlParser: true,
+    },
+    (err) => {
+      if (err) throw err;
+    },
+  );
+}
 const { connection } = mongoose;
 
-module.exports = connection;
+module.exports = { initDB, connection };
