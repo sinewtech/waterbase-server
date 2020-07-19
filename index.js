@@ -6,9 +6,9 @@ const cors = require('cors');
 const body = require('body-parser');
 const path = require('path');
 const fs = require('fs');
+const Auth = require('./routers/auth');
 
 const PORT = process.env.PORT || 3001;
-
 const app = express();
 
 app.use(cors());
@@ -26,6 +26,7 @@ const accessLogStream = fs.createWriteStream(
 );
 app.use(morgan('tiny', { stream: accessLogStream }));
 
+app.use('/auth', Auth);
 app.listen(PORT, () => {
   console.log(`App running at ${PORT}`);
 });
