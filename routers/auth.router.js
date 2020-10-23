@@ -28,11 +28,11 @@ Auth.post('/', (req, res, next) => {
 // update one user
 Auth.put('/', (req, res, next) => {
   const { body } = req;
-  const { where, document } = body;
+  const { where, user } = body;
   Users.findOne(where, (err) => {
     if (err) next(err);
-    if (!document.password) {
-      Users.updateOne(where, { $set: document })
+    if (!user.password) {
+      Users.updateOne(where, { $set: user })
         .then((data) => {
           res.status(200).json({ success: true, info: data });
         })
@@ -40,9 +40,9 @@ Auth.put('/', (req, res, next) => {
           next(error);
         });
     } else {
-      hash(document.password, SALT)
+      hash(user.password, SALT)
         .then((value) => {
-          Users.updateOne(where, { $set: { ...document, password: value } })
+          Users.updateOne(where, { $set: { ...user, password: value } })
             .then((info) => {
               res.status(200).json({ success: true, ...info });
             })
