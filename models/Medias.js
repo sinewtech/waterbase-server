@@ -5,4 +5,4 @@ const mediaSchema = new mongoose.Schema({
   name: { type: String, required: true },
 });
 
-module.exports = mongoose.model('SINEBASE_MEDIA', mediaSchema);
+module.exports = mongoose.model('waterbase_medias', mediaSchema);

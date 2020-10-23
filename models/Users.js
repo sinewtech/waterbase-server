@@ -4,6 +4,7 @@ const userSchema = new mongoose.Schema({
   email: {
     type: String,
     index: true,
+    unique: true,
     required: true,
     match: /[^@ \t\r\n]+@[^@ \t\r\n]+\.[^@ \t\r\n]+/,
   },
@@ -11,4 +12,4 @@ const userSchema = new mongoose.Schema({
   profile: { type: Object, required: false },
 });
 
-module.exports = mongoose.model('SINEBASE_USERS', userSchema);
+module.exports = mongoose.model('waterbase_users', userSchema);
