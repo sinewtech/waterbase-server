@@ -6,7 +6,8 @@ const cors = require('cors');
 const body = require('body-parser');
 const path = require('path');
 const fs = require('fs');
-const Auth = require('./routers/auth');
+const Auth = require('./routers/auth.router');
+const Media = require('./routers/media.router');
 const { initDB } = require('./helpers/mongoUtil');
 
 const PORT = process.env.PORT || 3001;
@@ -29,6 +30,8 @@ const accessLogStream = fs.createWriteStream(
 app.use(morgan('tiny', { stream: accessLogStream }));
 
 app.use('/auth', Auth);
+app.use('/media', Media);
+
 app.listen(PORT, () => {
   console.log(`App running at ${PORT}`);
 });

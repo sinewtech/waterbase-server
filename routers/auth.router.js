@@ -1,6 +1,6 @@
 const express = require('express');
 const { hash } = require('bcryptjs');
-const Users = require('../models/Users');
+const Users = require('../models/Users.model');
 const defaultError = require('../middlewares/defaultError');
 
 const Auth = express.Router();
