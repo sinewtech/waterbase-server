@@ -7,7 +7,8 @@ function initDB() {
     {
       useUnifiedTopology: true,
       useNewUrlParser: true,
-      useFindAndModify: true,
+      useCreateIndex: true,
+      useFindAndModify: false,
       user: process.env.MONGO_USER,
       pass: process.env.MONGO_PASS,
     },
