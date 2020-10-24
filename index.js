@@ -7,10 +7,11 @@ const body = require('body-parser');
 const path = require('path');
 const fs = require('fs');
 const Auth = require('./routers/auth.router');
-const Media = require('./routers/media.router');
+const File = require('./routers/files.router');
 const { initDB } = require('./helpers/mongoUtil');
 
 const PORT = process.env.PORT || 3001;
+const FILES = process.env.FILES_FOLDER || 'uploads';
 const app = express();
 initDB();
 
@@ -30,7 +31,8 @@ const accessLogStream = fs.createWriteStream(
 app.use(morgan('tiny', { stream: accessLogStream }));
 
 app.use('/auth', Auth);
-app.use('/media', Media);
+app.use('/files', File);
+app.use(`/${FILES}`, express.static(FILES));
 
 app.listen(PORT, () => {
   console.log(`App running at ${PORT}`);
