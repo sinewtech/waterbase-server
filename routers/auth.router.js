@@ -14,15 +14,11 @@ Auth.post('/', (req, res, next) => {
     .then((value) => {
       Users.create({ email, profile: profile || {}, password: value })
         .then((info) => {
-          res.status(200).json({ success: true, ...info });
+          res.status(200).json({ success: true, ...info.toObject() });
         })
-        .catch((error) => {
-          next(error);
-        });
+        .catch(next);
     })
-    .catch((error) => {
-      next(error);
-    });
+    .catch(next);
 });
 
 // update one user
@@ -36,23 +32,17 @@ Auth.put('/', (req, res, next) => {
         .then((data) => {
           res.status(200).json({ success: true, info: data });
         })
-        .catch((error) => {
-          next(error);
-        });
+        .catch(next);
     } else {
       hash(user.password, SALT)
         .then((value) => {
           Users.updateOne(where, { $set: { ...user, password: value } })
             .then((info) => {
-              res.status(200).json({ success: true, ...info });
+              res.status(200).json({ success: true, ...info.toObject() });
             })
-            .catch((error) => {
-              next(error);
-            });
+            .catch(next);
         })
-        .catch((error) => {
-          next(error);
-        });
+        .catch(next);
     }
   });
 });
@@ -63,9 +53,7 @@ Auth.get('/', (req, res, next) => {
     .then((data) => {
       res.status(200).json({ success: true, users: data });
     })
-    .catch((error) => {
-      next(error);
-    });
+    .catch(next);
 });
 
 // get one user
@@ -75,9 +63,7 @@ Auth.get('/:id', (req, res, next) => {
     .then((data) => {
       res.status(200).json({ success: true, user: data });
     })
-    .catch((error) => {
-      next(error);
-    });
+    .catch(next);
 });
 
 // delete one user
@@ -88,9 +74,7 @@ Auth.delete('/', (req, res, next) => {
     .then((data) => {
       res.status(200).json({ success: true, info: data });
     })
-    .catch((error) => {
-      next(error);
-    });
+    .catch(next);
 });
 
 Auth.use(defaultError);
