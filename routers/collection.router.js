@@ -65,6 +65,8 @@ Collections.delete('/delete/:collection', (req, res, next) => {
 Collections.put('/update/:collection', (req, res, next) => {
   const { collection } = req.params;
   const { query, update } = req.body;
+  if (query._id && mongoose.isValidObjectId(query._id))
+    query._id = new mongoose.Types.ObjectId(query._id);
   connection
     .collection(collection)
     .findOneAndUpdate(query, update)
