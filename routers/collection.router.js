@@ -32,20 +32,8 @@ Collections.get('/:collection', (req, res, next) => {
     .catch(next);
 });
 
-// Get a doc by id and collection
-Collections.get('/:collection/:doc', (req, res, next) => {
-  const { collection, doc } = req.params;
-  connection
-    .collection(collection)
-    .findOne({ _id: mongoose.Types.ObjectId(doc) })
-    .then((value) => {
-      res.status(200).json({ success: true, doc: value });
-    })
-    .catch(next);
-});
-
 // Query any collection for N docs
-Collections.post('/:collection/query', (req, res, next) => {
+Collections.post('/query/:collection', (req, res, next) => {
   const { collection } = req.params;
   const { query } = req.body;
   if (query._id && mongoose.isValidObjectId(query._id))
@@ -60,7 +48,7 @@ Collections.post('/:collection/query', (req, res, next) => {
     .catch(next);
 });
 
-Collections.delete('/:collection/delete', (req, res, next) => {
+Collections.delete('/delete/:collection', (req, res, next) => {
   const { collection } = req.params;
   const { query } = req.body;
   if (query._id && mongoose.isValidObjectId(query._id))
@@ -69,7 +57,19 @@ Collections.delete('/:collection/delete', (req, res, next) => {
     .collection(collection)
     .deleteMany(query)
     .then((value) => {
-      res.status(200).json({ success: true, docs: value });
+      res.status(200).json({ success: true, info: value });
+    })
+    .catch(next);
+});
+
+Collections.put('/update/:collection', (req, res, next) => {
+  const { collection } = req.params;
+  const { query, update } = req.body;
+  connection
+    .collection(collection)
+    .findOneAndUpdate(query, update)
+    .then((value) => {
+      res.status(200).json({ success: true, info: value });
     })
     .catch(next);
 });

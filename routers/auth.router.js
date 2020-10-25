@@ -13,8 +13,8 @@ Auth.post('/', (req, res, next) => {
   hash(password, SALT)
     .then((value) => {
       Users.create({ email, profile: profile || {}, password: value })
-        .then((info) => {
-          res.status(200).json({ success: true, ...info.toObject() });
+        .then((value) => {
+          res.status(200).json({ success: true, ...value.toObject() });
         })
         .catch(next);
     })
@@ -29,16 +29,16 @@ Auth.put('/', (req, res, next) => {
     if (err) next(err);
     if (!user.password) {
       Users.updateOne(where, { $set: user })
-        .then((data) => {
-          res.status(200).json({ success: true, info: data });
+        .then((value) => {
+          res.status(200).json({ success: true, info: value });
         })
         .catch(next);
     } else {
       hash(user.password, SALT)
         .then((value) => {
           Users.updateOne(where, { $set: { ...user, password: value } })
-            .then((info) => {
-              res.status(200).json({ success: true, ...info.toObject() });
+            .then((value) => {
+              res.status(200).json({ success: true, ...value.toObject() });
             })
             .catch(next);
         })
