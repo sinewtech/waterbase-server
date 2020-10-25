@@ -2,12 +2,14 @@ const express = require('express');
 const mongoose = require('mongoose');
 const { connection } = require('../helpers/mongoUtil');
 const defaultError = require('../middlewares/defaultError');
+const { collection } = require('../models/Users.model');
 
 const Collections = express.Router();
 
 // Create doc and or collection
-Collections.post('/', (req, res, next) => {
-  const { collection, object } = req.body;
+Collections.post('/:collection', (req, res, next) => {
+  const { collection } = req.params;
+  const { object } = req.body;
   connection
     .collection(collection)
     .insertOne(object)
@@ -43,14 +45,29 @@ Collections.get('/:collection/:doc', (req, res, next) => {
 });
 
 // Query any collection for N docs
-Collections.post('/query', (req, res, next) => {
-  const { collection, query } = req.body;
+Collections.post('/:collection/query', (req, res, next) => {
+  const { collection } = req.params;
+  const { query } = req.body;
   if (query._id && mongoose.isValidObjectId(query._id))
     query._id = new mongoose.Types.ObjectId(query._id);
   connection
     .collection(collection)
     .find(query)
     .toArray()
+    .then((value) => {
+      res.status(200).json({ success: true, docs: value });
+    })
+    .catch(next);
+});
+
+Collections.delete('/:collection/delete', (req, res, next) => {
+  const { collection } = req.params;
+  const { query } = req.body;
+  if (query._id && mongoose.isValidObjectId(query._id))
+    query._id = new mongoose.Types.ObjectId(query._id);
+  connection
+    .collection(collection)
+    .deleteMany(query)
     .then((value) => {
       res.status(200).json({ success: true, docs: value });
     })
