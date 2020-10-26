@@ -14,7 +14,7 @@ Collections.post('/:collection', (req, res, next) => {
     .collection(collection)
     .insertOne(object)
     .then((info) => {
-      res.status(200).json({ success: true, ...info.result });
+      res.status(200).json({ success: true, doc: info.ops[0] });
     })
     .catch(next);
 });
