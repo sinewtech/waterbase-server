@@ -4,7 +4,7 @@ const fs = require('fs');
 const fsPromises = require('fs').promises;
 const path = require('path');
 const crypto = require('crypto');
-const defaultError = require('../middlewares/defaultError');
+const middlewares = require('../middlewares');
 const File = require('../models/Files.model');
 
 const Files = express.Router();
@@ -119,6 +119,6 @@ Files.put('/', upload.single('file'), (req, res, next) => {
     .catch(next);
 });
 
-Files.use(defaultError);
+Files.use(middlewares.defaultError);
 
 module.exports = Files;

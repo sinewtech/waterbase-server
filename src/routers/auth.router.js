@@ -1,7 +1,7 @@
 const express = require('express');
 const { hash } = require('bcryptjs');
 const Users = require('../models/Users.model');
-const defaultError = require('../middlewares/defaultError');
+const middlewares = require('../middlewares');
 
 const Auth = express.Router();
 const SALT = parseInt(process.env.SALT_ROUNDS, 10) || 10;
@@ -77,6 +77,6 @@ Auth.delete('/', (req, res, next) => {
     .catch(next);
 });
 
-Auth.use(defaultError);
+Auth.use(middlewares.defaultError);
 
 module.exports = Auth;

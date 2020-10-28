@@ -1,7 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const { connection } = require('../helpers/mongoUtil');
-const defaultError = require('../middlewares/defaultError');
+const middlewares = require('../middlewares');
 const { collection } = require('../models/Users.model');
 
 const Collections = express.Router();
@@ -76,6 +76,6 @@ Collections.put('/update/:collection', (req, res, next) => {
     .catch(next);
 });
 
-Collections.use(defaultError);
+Collections.use(middlewares.defaultError);
 
 module.exports = Collections;
