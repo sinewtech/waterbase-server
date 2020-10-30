@@ -18,7 +18,6 @@ app.use(cors());
 app.use(body.urlencoded({ extended: true }));
 app.use(body.json());
 app.use(helmet());
-app.use(middlewares.keyChecker);
 
 if (!fs.existsSync('logs')) {
   fs.mkdirSync('logs');
@@ -30,6 +29,7 @@ const accessLogStream = fs.createWriteStream(
 );
 app.use(morgan('tiny', { stream: accessLogStream }));
 
+app.use('/wenas', express.static('frontend'));
 app.use('/api', api);
 
 app.use(middlewares.defaultError);
