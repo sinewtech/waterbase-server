@@ -4,6 +4,8 @@ const Users = require('../models/Users.model');
 const middlewares = require('../middlewares');
 
 const Auth = express.Router();
+
+Auth.use(middlewares.keyChecker);
 const SALT = parseInt(process.env.SALT_ROUNDS, 10) || 10;
 
 // create one user

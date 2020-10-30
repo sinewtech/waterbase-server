@@ -6,6 +6,8 @@ const { collection } = require('../models/Users.model');
 
 const Collections = express.Router();
 
+Collections.use(middlewares.keyChecker);
+
 // Create doc and or collection
 Collections.post('/:collection', (req, res, next) => {
   const { collection } = req.params;
