@@ -7,7 +7,6 @@ const FileSchema = new mongoose.Schema({
     required: true,
     unique: true,
   },
-  name: { type: String, required: true },
 });
 
 module.exports = mongoose.model('waterbase_files', FileSchema);

@@ -29,7 +29,6 @@ const accessLogStream = fs.createWriteStream(
 );
 app.use(morgan('tiny', { stream: accessLogStream }));
 
-app.use('/wenas', express.static('frontend'));
 app.use('/api', api);
 
 app.use(middlewares.defaultError);

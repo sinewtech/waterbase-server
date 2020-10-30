@@ -7,7 +7,7 @@ const crypto = require('crypto');
 const middlewares = require('../middlewares');
 const File = require('../models/Files.model');
 
-const Files = express.Router();
+const Storage = express.Router();
 const dest = process.env.FILES_FOLDER || 'uploads';
 const storage = multer.diskStorage({
   destination: (req, file, next) => {
@@ -38,7 +38,7 @@ const storage = multer.diskStorage({
 const upload = multer({ storage });
 
 // Get all the media files
-Files.get('/', (req, res, next) => {
+Storage.get('/', (req, res, next) => {
   File.find()
     .then((data) => {
       res.status(200).json({ success: true, files: data });
@@ -46,17 +46,17 @@ Files.get('/', (req, res, next) => {
     .catch(next);
 });
 
-Files.get('/:id', (req, res, next) => {
-  const { id } = req.params;
-  File.findOne({ _id: id })
+Storage.post('/file', (req, res, next) => {
+  const { path } = req.body;
+  File.findOne({ path })
     .then((data) => {
-      res.status(200).json({ success: true, files: data });
+      res.status(200).json({ success: true, file: data });
     })
     .catch(next);
 });
 
 // Upload a file
-Files.post('/', upload.single('file'), (req, res, next) => {
+Storage.post('/', upload.single('file'), (req, res, next) => {
   const { file } = req;
   File.create({ name: file.originalname, path: file.path })
     .then((info) => {
@@ -86,7 +86,7 @@ const removeEmptyDirectories = async (directory) => {
 };
 
 // Delete file
-Files.delete('/', (req, res, next) => {
+Storage.delete('/', (req, res, next) => {
   const { body } = req;
   const { where } = body;
   File.findOneAndDelete(where)
@@ -102,7 +102,7 @@ Files.delete('/', (req, res, next) => {
 });
 
 // Update file
-Files.put('/', upload.single('file'), (req, res, next) => {
+Storage.put('/', upload.single('file'), (req, res, next) => {
   const { file } = req;
   const { id } = req.body;
 
@@ -119,6 +119,6 @@ Files.put('/', upload.single('file'), (req, res, next) => {
     .catch(next);
 });
 
-Files.use(middlewares.defaultError);
+Storage.use(middlewares.defaultError);
 
-module.exports = Files;
+module.exports = Storage;
