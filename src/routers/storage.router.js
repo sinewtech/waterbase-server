@@ -11,8 +11,8 @@ const dest = process.env.FILES_FOLDER || 'uploads';
 const storage = multer.diskStorage({
   destination: (req, file, next) => {
     const { path: reqPath } = req.body;
-    const newDestination = `${dest}/${reqPath}`;
-    console.log(newDestination);
+    const justFolders = path.dirname(reqPath);
+    const newDestination = path.normalize(`${dest}/${justFolders}`);
     let stat = null;
     try {
       stat = fs.statSync(newDestination);
@@ -26,8 +26,10 @@ const storage = multer.diskStorage({
     }
     next(null, newDestination);
   },
-  filename: (_req, file, cb) => {
-    cb(null, `${file.originalname}`);
+  filename: (req, _file, cb) => {
+    const { path: reqPath } = req.body;
+    const justFile = path.basename(reqPath);
+    cb(null, `${justFile}`);
   },
 });
 
@@ -38,13 +40,12 @@ Storage.use(middlewares.keyChecker);
 // Get a file
 Storage.post('/file', (req, res, next) => {
   const { path: filePath } = req.body;
-  const finalPath = path.normalize(filePath);
-  console.log(finalPath);
+  const finalPath = path.normalize(`${dest}\\${filePath}`);
   File.findOne({ path: finalPath })
     .then((doc) => {
       res.status(200).json({
         success: true,
-        file: doc ? { id: doc.id, ...doc.toJSON(), path: `${dest}${doc.path}` } : null,
+        file: doc ? doc.toJSON() : null,
       });
     })
     .catch(next);
@@ -54,8 +55,7 @@ Storage.post('/file', (req, res, next) => {
 Storage.post('/', upload.single('file'), (req, res, next) => {
   const { file } = req;
   const { path: filePath } = file;
-  const finalPath = filePath.replace(dest, '');
-  File.create({ path: finalPath })
+  File.create({ path: path.normalize(filePath) })
     .then((info) => {
       res.status(200).json({ ...info.toJSON() });
     })
@@ -64,11 +64,12 @@ Storage.post('/', upload.single('file'), (req, res, next) => {
 
 // Delete a file
 Storage.delete('/', (req, res, next) => {
-  const { path } = req.body;
-  File.findOneAndDelete({ path })
+  const { path: filePath } = req.body;
+  const finalPath = path.normalize(`${dest}\\${filePath}`);
+  File.findOneAndDelete({ path: finalPath })
     .then((data) => {
       if (data !== null) {
-        fs.unlink(data.path, (error) => {
+        fs.unlink(finalPath, (error) => {
           if (error) next(error);
           removeEmptyDirectories(dest).then(() => {
             res.status(200).json({ success: true, info: data });
@@ -82,6 +83,25 @@ Storage.delete('/', (req, res, next) => {
 });
 
 // Update a file
+Storage.put('/', upload.single('file'), (req, res, next) => {
+  const { path: newFilePath, oldPath: oldFilePath } = req.body;
+  const newFinalPath = path.normalize(`${dest}\\${newFilePath}`);
+  const oldFinalPath = path.normalize(`${dest}\\${oldFilePath}`);
+  File.findOneAndUpdate({ path: oldFinalPath }, { $set: { path: newFinalPath } })
+    .then((data) => {
+      if (data !== null) {
+        fs.unlink(oldFinalPath, (error) => {
+          if (error) next(error);
+          removeEmptyDirectories(dest).then(() => {
+            res.status(200).json({ success: true, info: data });
+          });
+        });
+      } else {
+        res.status(200).json({ success: false, info: data });
+      }
+    })
+    .catch(next);
+});
 
 const removeEmptyDirectories = async (directory) => {
   const fileStats = await fsPromises.lstat(directory);
