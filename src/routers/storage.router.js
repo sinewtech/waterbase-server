@@ -44,7 +44,7 @@ Storage.post('/file', (req, res, next) => {
   File.findOne({ path: finalPath })
     .then((doc) => {
       res.status(200).json({
-        success: true,
+        success: doc !== null,
         file: doc ? doc.toJSON() : null,
       });
     })
