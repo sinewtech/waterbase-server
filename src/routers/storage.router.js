@@ -40,12 +40,12 @@ Storage.use(middlewares.keyChecker);
 // Get a file
 Storage.post('/file', (req, res, next) => {
   const { path: filePath } = req.body;
-  const finalPath = path.normalize(`${dest}\\${filePath}`);
+  const finalPath = path.normalize(filePath);
   File.findOne({ path: finalPath })
     .then((doc) => {
       res.status(200).json({
         success: doc !== null,
-        file: doc ? doc.toJSON() : null,
+        file: doc ? { ...doc.toJSON(), path: `${dest}\\${doc.path}` } : null,
       });
     })
     .catch(next);
@@ -53,8 +53,7 @@ Storage.post('/file', (req, res, next) => {
 
 // Upload a file
 Storage.post('/', upload.single('file'), (req, res, next) => {
-  const { file } = req;
-  const { path: filePath } = file;
+  const { path: filePath } = req.body;
   File.create({ path: path.normalize(filePath) })
     .then((info) => {
       res.status(200).json({ ...info.toJSON() });
@@ -65,11 +64,11 @@ Storage.post('/', upload.single('file'), (req, res, next) => {
 // Delete a file
 Storage.delete('/', (req, res, next) => {
   const { path: filePath } = req.body;
-  const finalPath = path.normalize(`${dest}\\${filePath}`);
+  const finalPath = path.normalize(filePath);
   File.findOneAndDelete({ path: finalPath })
     .then((data) => {
       if (data !== null) {
-        fs.unlink(finalPath, (error) => {
+        fs.unlink(`${dest}\\${filePath}`, (error) => {
           if (error) next(error);
           removeEmptyDirectories(dest).then(() => {
             res.status(200).json({ success: true, info: data });
@@ -85,16 +84,19 @@ Storage.delete('/', (req, res, next) => {
 // Update a file
 Storage.put('/', upload.single('file'), (req, res, next) => {
   const { path: newFilePath, oldPath: oldFilePath } = req.body;
-  const newFinalPath = path.normalize(`${dest}\\${newFilePath}`);
-  const oldFinalPath = path.normalize(`${dest}\\${oldFilePath}`);
+  const newFinalPath = path.normalize(newFilePath);
+  const oldFinalPath = path.normalize(oldFilePath);
   File.findOneAndUpdate({ path: oldFinalPath }, { $set: { path: newFinalPath } })
     .then((data) => {
       if (data !== null) {
-        fs.unlink(oldFinalPath, (error) => {
-          if (error) next(error);
-          removeEmptyDirectories(dest).then(() => {
-            res.status(200).json({ success: true, info: data });
-          });
+        fs.unlink(`${dest}\\${oldFilePath}`, (error) => {
+          if (error) {
+            next(error);
+          } else {
+            removeEmptyDirectories(dest).then(() => {
+              res.status(200).json({ success: true, info: data });
+            });
+          }
         });
       } else {
         res.status(200).json({ success: false, info: data });
