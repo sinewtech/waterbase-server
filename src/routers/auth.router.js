@@ -1,25 +1,33 @@
 const express = require('express');
 const { hash } = require('bcryptjs');
+const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
 const Users = require('../models/Users.model');
 const middlewares = require('../middlewares');
+const RefreshTokens = require('../models/RefreshTokens.model');
 
 const Auth = express.Router();
 
 Auth.use(middlewares.keyChecker);
 const SALT = parseInt(process.env.SALT_ROUNDS, 10) || 10;
+const ACCESS_TOKEN = process.env.JWT_ACCESS_KEY;
 
 // create one user
 Auth.post('/', (req, res, next) => {
   const { body } = req;
   const { email, profile, password } = body;
   hash(password, SALT)
-    .then((value) => {
-      Users.create({ email, profile: profile || {}, password: value })
+    .then((hashedPass) => {
+      Users.create({ email, profile: profile || {}, password: hashedPass })
         .then((value) => {
-          const userValue = { email, profile: profile || {}, password: value };
-          const accessToken = jwt.sign(userValue, process.env.JWT_ACCESS_TOKEN);
-          res.status(201).json({ success: true, accessToken });
+          const refreshToken = crypto.randomBytes(16).toString('hex');
+          RefreshTokens.create({ token: refreshToken, email })
+            .then(() => {
+              const userValue = { id: value.id, email, profile: profile || {}, refreshToken };
+              const token = jwt.sign(userValue, ACCESS_TOKEN);
+              res.status(201).json({ success: true, token });
+            })
+            .catch(next);
         })
         .catch(next);
     })
@@ -27,9 +35,11 @@ Auth.post('/', (req, res, next) => {
 });
 
 // update one user
-Auth.put('/', (req, res, next) => {
+Auth.put('/:id', (req, res, next) => {
   const { body } = req;
-  const { where, user } = body;
+  const { id } = req.params;
+  const { user } = body;
+  const where = { _id: id };
   Users.findOne(where)
     .then((value) => {
       if (value !== null) {
@@ -41,8 +51,8 @@ Auth.put('/', (req, res, next) => {
             .catch(next);
         } else {
           hash(user.password, SALT)
-            .then((value) => {
-              Users.updateOne(where, { $set: { ...user, password: value } })
+            .then((hashedPass) => {
+              Users.updateOne(where, { $set: { ...user, password: hashedPass } })
                 .then((value) => {
                   res.status(200).json({ success: true, ...value.toObject() });
                 })
@@ -65,7 +75,7 @@ Auth.get('/', (req, res, next) => {
       if (value !== null) {
         res.status(200).json({ success: true, users: data });
       } else {
-        const error = new Error('Was unable to get a user with that query');
+        const error = new Error('Was unable to get users');
         next(error);
       }
     })
@@ -80,7 +90,7 @@ Auth.get('/:id', (req, res, next) => {
       if (data !== null) {
         res.status(200).json({ success: true, user: data });
       } else {
-        const error = new Error('Was unable to get a user with that query');
+        const error = new Error('Was unable to get a user with that id');
         next(error);
       }
     })
@@ -96,14 +106,16 @@ Auth.delete('/', (req, res, next) => {
       if (data.n !== 0) {
         res.status(200).json({ success: true, info: data });
       } else {
-        const error = new Error('Was unable to get a user with that query');
+        const error = new Error('Was unable to delete users with that query');
         next(error);
       }
     })
     .catch(next);
 });
 
-Auth.post('/login', (req, res, next) => {});
+Auth.post('/login', (req, res, next) => {
+  // TODO
+});
 
 Auth.use(middlewares.defaultError);
 
