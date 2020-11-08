@@ -1,5 +1,5 @@
 const express = require('express');
-const { hash } = require('bcryptjs');
+const { hash, compareSync } = require('bcryptjs');
 const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
 const Users = require('../models/Users.model');
@@ -61,7 +61,7 @@ Auth.put('/:id', (req, res, next) => {
             .catch(next);
         }
       } else {
-        const error = new Error('Was unable to get a user with that query');
+        const error = new Error(`Was unable to update a user with the id: ${id}`);
         next(error);
       }
     })
@@ -72,10 +72,10 @@ Auth.put('/:id', (req, res, next) => {
 Auth.get('/', (req, res, next) => {
   Users.find()
     .then((data) => {
-      if (value !== null) {
+      if (data !== null) {
         res.status(200).json({ success: true, users: data });
       } else {
-        const error = new Error('Was unable to get users');
+        const error = new Error('Theres no users to show');
         next(error);
       }
     })
@@ -90,7 +90,7 @@ Auth.get('/:id', (req, res, next) => {
       if (data !== null) {
         res.status(200).json({ success: true, user: data });
       } else {
-        const error = new Error('Was unable to get a user with that id');
+        const error = new Error(`Was unable to get a user with the id: ${id}`);
         next(error);
       }
     })
@@ -98,15 +98,15 @@ Auth.get('/:id', (req, res, next) => {
 });
 
 // delete one user
-Auth.delete('/', (req, res, next) => {
+Auth.delete('/:id', (req, res, next) => {
   const { body } = req;
-  const { where } = body;
-  Users.deleteOne(where)
+  const { id } = req.params;
+  Users.deleteOne({ _id: id })
     .then((data) => {
       if (data.n !== 0) {
         res.status(200).json({ success: true, info: data });
       } else {
-        const error = new Error('Was unable to delete users with that query');
+        const error = new Error(`Was unable to delete a user with the id: ${id}`);
         next(error);
       }
     })
@@ -114,8 +114,42 @@ Auth.delete('/', (req, res, next) => {
 });
 
 Auth.post('/login', (req, res, next) => {
-  // TODO
+  const { body } = req;
+  const { email, password } = body;
+  Users.findOne({ email })
+    .then((user) => {
+      if (user !== null) {
+        if (compareSync(password, user.password)) {
+          const refreshToken = crypto.randomBytes(16).toString('hex');
+          RefreshTokens.findOneAndDelete({ email: email })
+            .then(() => {
+              RefreshTokens.create({ token: refreshToken, email })
+                .then(() => {
+                  const userValue = {
+                    id: user.id,
+                    email,
+                    profile: user.profile || {},
+                    refreshToken,
+                  };
+                  const token = jwt.sign(userValue, ACCESS_TOKEN);
+                  res.status(201).json({ success: true, token });
+                })
+                .catch(next);
+            })
+            .catch(next);
+        } else {
+          const error = new Error('Password incorrect');
+          next(error);
+        }
+      } else {
+        const error = new Error('Email not found');
+        next(error);
+      }
+    })
+    .catch(next);
 });
+
+Auth.post('/token', (req, res, next) => {});
 
 Auth.use(middlewares.defaultError);
 
