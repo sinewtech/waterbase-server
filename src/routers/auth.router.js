@@ -138,7 +138,7 @@ Auth.post('/login', (req, res, next) => {
             })
             .catch(next);
         } else {
-          const error = new Error('Password incorrect');
+          const error = new Error('Incorrect password');
           next(error);
         }
       } else {
@@ -149,7 +149,9 @@ Auth.post('/login', (req, res, next) => {
     .catch(next);
 });
 
-Auth.post('/token', (req, res, next) => {});
+Auth.post('/token', (req, res, next) => {
+  next(new Error('Unfinished route'));
+});
 
 Auth.use(middlewares.defaultError);
 
