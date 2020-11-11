@@ -36,9 +36,8 @@ Auth.post('/', (req, res, next) => {
 
 // update one user
 Auth.put('/:id', (req, res, next) => {
-  const { body } = req;
   const { id } = req.params;
-  const { user } = body;
+  const { user } = req.body;
   const where = { _id: id };
   Users.findOne(where)
     .then((value) => {
@@ -97,29 +96,8 @@ Auth.get('/:id', (req, res, next) => {
     .catch(next);
 });
 
-// delete one user
-Auth.delete('/:id', (req, res, next) => {
-  const { body } = req;
-  const { id } = req.params;
-  Users.findOneAndDelete({ _id: id })
-    .then((data) => {
-      if (data !== null) {
-        RefreshTokens.findOneAndDelete({ email: data.email })
-          .then(() => {
-            res.status(200).json({ success: true, info: data });
-          })
-          .catch(next);
-      } else {
-        const error = new Error(`Was unable to delete a user with the id: ${id}`);
-        next(error);
-      }
-    })
-    .catch(next);
-});
-
 Auth.post('/login', (req, res, next) => {
-  const { body } = req;
-  const { email, password } = body;
+  const { email, password } = req.body;
   Users.findOne({ email })
     .then((user) => {
       if (user !== null) {
@@ -182,6 +160,39 @@ Auth.post('/token', (req, res, next) => {
           .catch(next);
       } else {
         res.status(401).json({ success: false });
+      }
+    })
+    .catch(next);
+});
+
+Auth.delete('/token', (req, res, next) => {
+  const { email } = req.body;
+  RefreshTokens.findOneAndDelete({ email })
+    .then((data) => {
+      if (data !== null) {
+        res.status(200).json({ success: true, token: data.toJSON() });
+      } else {
+        const error = new Error('User not found');
+        next(error);
+      }
+    })
+    .catch(next);
+});
+
+// delete one user
+Auth.delete('/:id', (req, res, next) => {
+  const { id } = req.params;
+  Users.findOneAndDelete({ _id: id })
+    .then((data) => {
+      if (data !== null) {
+        RefreshTokens.findOneAndDelete({ email: data.email })
+          .then(() => {
+            res.status(200).json({ success: true, info: data });
+          })
+          .catch(next);
+      } else {
+        const error = new Error(`Was unable to delete a user with the id: ${id}`);
+        next(error);
       }
     })
     .catch(next);
