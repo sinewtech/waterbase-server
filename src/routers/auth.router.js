@@ -150,7 +150,37 @@ Auth.post('/login', (req, res, next) => {
 });
 
 Auth.post('/token', (req, res, next) => {
-  next(new Error('Unfinished route'));
+  const { email, token } = req.body;
+  RefreshTokens.findOneAndDelete({ email, token })
+    .then((data) => {
+      if (data !== null) {
+        Users.findOne({ email })
+          .then((user) => {
+            if (user !== null) {
+              const RT = crypto.randomBytes(16).toString('hex');
+              RefreshTokens.create({ token: RT, email })
+                .then(() => {
+                  const userValue = {
+                    id: user.id,
+                    email,
+                    profile: user.profile || {},
+                    refreshToken: RT,
+                  };
+                  const newToken = jwt.sign(userValue, ACCESS_TOKEN);
+                  res.status(201).json({ success: true, token: newToken });
+                })
+                .catch(next);
+            } else {
+              const error = new Error('User not found');
+              next(error);
+            }
+          })
+          .catch(next);
+      } else {
+        res.status(401).json({ success: false });
+      }
+    })
+    .catch(next);
 });
 
 Auth.use(middlewares.defaultError);
