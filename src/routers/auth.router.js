@@ -131,7 +131,7 @@ Auth.post('/login', (req, res, next) => {
                     profile: user.profile || {},
                     refreshToken,
                   };
-                  const token = jwt.sign(userValue, ACCESS_TOKEN);
+                  const token = jwt.sign(userValue, ACCESS_TOKEN, { expiresIn: '12h' });
                   res.status(201).json({ success: true, token });
                 })
                 .catch(next);
@@ -166,7 +166,7 @@ Auth.post('/token', (req, res, next) => {
                     profile: user.profile || {},
                     refreshToken: RT,
                   };
-                  const newToken = jwt.sign(userValue, ACCESS_TOKEN);
+                  const newToken = jwt.sign(userValue, ACCESS_TOKEN, { expiresIn: '12h' });
                   res.status(201).json({ success: true, token: newToken });
                 })
                 .catch(next);
