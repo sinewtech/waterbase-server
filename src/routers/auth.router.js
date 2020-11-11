@@ -24,7 +24,7 @@ Auth.post('/', (req, res, next) => {
           RefreshTokens.create({ token: refreshToken, email })
             .then(() => {
               const userValue = { id: value.id, email, profile: profile || {}, refreshToken };
-              const token = jwt.sign(userValue, ACCESS_TOKEN);
+              const token = jwt.sign(userValue, ACCESS_TOKEN, { expiresIn: '300' });
               res.status(201).json({ success: true, token });
             })
             .catch(next);
@@ -101,10 +101,14 @@ Auth.get('/:id', (req, res, next) => {
 Auth.delete('/:id', (req, res, next) => {
   const { body } = req;
   const { id } = req.params;
-  Users.deleteOne({ _id: id })
+  Users.findOneAndDelete({ _id: id })
     .then((data) => {
-      if (data.n !== 0) {
-        res.status(200).json({ success: true, info: data });
+      if (data !== null) {
+        RefreshTokens.findOneAndDelete({ email: data.email })
+          .then(() => {
+            res.status(200).json({ success: true, info: data });
+          })
+          .catch(next);
       } else {
         const error = new Error(`Was unable to delete a user with the id: ${id}`);
         next(error);
@@ -131,7 +135,7 @@ Auth.post('/login', (req, res, next) => {
                     profile: user.profile || {},
                     refreshToken,
                   };
-                  const token = jwt.sign(userValue, ACCESS_TOKEN, { expiresIn: '12h' });
+                  const token = jwt.sign(userValue, ACCESS_TOKEN, { expiresIn: '300' });
                   res.status(201).json({ success: true, token });
                 })
                 .catch(next);
@@ -166,7 +170,7 @@ Auth.post('/token', (req, res, next) => {
                     profile: user.profile || {},
                     refreshToken: RT,
                   };
-                  const newToken = jwt.sign(userValue, ACCESS_TOKEN, { expiresIn: '12h' });
+                  const newToken = jwt.sign(userValue, ACCESS_TOKEN, { expiresIn: '300' });
                   res.status(201).json({ success: true, token: newToken });
                 })
                 .catch(next);
