@@ -1,12 +1,12 @@
 version: '3.8'
 services:
-  waterbase-server:
+  server:
     build: .
     ports:
       - '1217:1217'
     volumes:
-      - ./logs:/usr/src/waterbaseServer/logs
-      - ./archive:/usr/src/waterbaseServer/archive
+      - ./logs:/usr/src/server/logs
+      - ./archive:/usr/src/server/archive
     depends_on:
       - mongo
   mongo:

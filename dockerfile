@@ -1,6 +1,6 @@
 FROM node:current-slim
 
-WORKDIR /usr/src/waterbaseServer
+WORKDIR /usr/src/server
 
 COPY package.json .
 
