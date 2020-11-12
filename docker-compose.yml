@@ -2,8 +2,10 @@ version: '3.8'
 services:
   waterbase-server:
     build: .
-    ports: '1217:1217'
-    volumes: -./logs:/data/logs
+    ports:
+      - '1217:1217'
+    volumes:
+      - ./logs:/data/logs
     depends_on: — mongo
   mongo:
     image: 'mongo'
