@@ -7,8 +7,10 @@ COPY package.json .
 RUN npm install
 
 EXPOSE 1217
-CMD [ "npm", "install", "-g", "pm2" ]
 
-CMD [ "pm2", "start", "src/index.start" ]
+RUN npm install pm2 -g
+
+CMD ["pm2-runtime", "src/index.js"]
+
 
 COPY . .
