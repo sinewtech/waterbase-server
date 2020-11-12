@@ -1,7 +1,7 @@
 {
   "name": "waterbase-server",
   "version": "0.0.1",
-  "description": "free, open source and self-hosted BaaS by Sinewave LLC.",
+  "description": "free, open source and self-hosted BaaS by Sinewave",
   "main": "index.js",
   "scripts": {
     "start": "node src/index.js",
@@ -9,14 +9,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/sinewtech/sinebase-server.git"
+    "url": "git+https://github.com/sinewtech/waterbase-server.git"
   },
   "author": "Sinewave LLC",
   "license": "GPL-3.0",
   "bugs": {
-    "url": "https://github.com/sinewtech/sinebase-server/issues"
+    "url": "https://github.com/sinewtech/waterbase-server/issues"
   },
-  "homepage": "https://github.com/sinewtech/sinebase-server#readme",
+  "homepage": "https://github.com/sinewtech/waterbase-server#readme",
   "dependencies": {
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.19.0",
