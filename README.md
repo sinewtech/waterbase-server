@@ -1,5 +1,5 @@
 # :droplet: Waterbase server
-Free, open source and self-hosted firebase server. 
+Free, open source and self-hosted BaaS server by Sinewave.
 
 ## Why
 We wanted to have the challenge of something really big...
