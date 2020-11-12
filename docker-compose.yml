@@ -6,7 +6,7 @@ services:
       - '1217:1217'
     volumes:
       - ./logs:/data/logs
-      - .:.
+      - ./archive:/data/archive
     depends_on:
       - mongo
   mongo:
