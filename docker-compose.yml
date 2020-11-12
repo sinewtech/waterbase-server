@@ -2,7 +2,10 @@ version: '3.8'
 services:
   waterbase-server:
     build: .
-  database:
+    ports: '1217:1217'
+    volumes: -./logs:/data/logs
+    depends_on: — mongo
+  mongo:
     image: 'mongo'
     environment:
       MONGO_INITDB_DATABASE: 'waterbase'
