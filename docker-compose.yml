@@ -5,8 +5,8 @@ services:
     ports:
       - '1217:1217'
     volumes:
-      - ./logs:/data/logs
-      - ./archive:/data/archive
+      - ./logs:/usr/src/waterbaseServer/logs
+      - ./archive:/usr/src/waterbaseServer/archive
     depends_on:
       - mongo
   mongo:
