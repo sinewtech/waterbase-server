@@ -6,7 +6,8 @@ services:
       - '1217:1217'
     volumes:
       - ./logs:/data/logs
-    depends_on: — mongo
+    depends_on:
+      - mongo
   mongo:
     image: 'mongo'
     environment:
