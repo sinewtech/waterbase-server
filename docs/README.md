@@ -175,4 +175,8 @@ wb.initialize({
 
 ### Firewall
 
-If you happen to have connecting but everything is running well, take a look at your server firewall, it could be blocking the ports we ask for
+If you happen to have connecting but everything is running well, take a look at your server firewall, it could be blocking the ports we ask for which are
+
+- 1217 for api
+- 8080 for dashboard (COMING SOON)
+- 27017 for mongodb
