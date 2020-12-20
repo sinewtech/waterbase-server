@@ -29,6 +29,13 @@ const accessLogStream = fs.createWriteStream(
 );
 app.use(morgan('tiny', { stream: accessLogStream }));
 
+if (process.env.NODE_ENV === 'production') {
+  app.use(express.static('client/public'));
+  app.get('/dash*', (req, res) => {
+    res.sendFile(path.resolve(__dirname, '..', 'client', 'public', 'index.html'));
+  });
+}
+
 app.use('/api', api);
 
 app.use(middlewares.defaultError);

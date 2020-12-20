@@ -18,6 +18,9 @@ pids
 # Dependency directories
 node_modules/
 
+# Client ignores
+client/public/build/
+
 # dotenv environment variables file
 .env
 .env.test
