@@ -19,7 +19,7 @@ pids
 node_modules/
 
 # Client ignores
-client/public/build/
+client/build/
 
 # dotenv environment variables file
 .env
