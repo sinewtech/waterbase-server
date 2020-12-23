@@ -9,5 +9,6 @@
   "parserOptions": {
     "ecmaVersion": 11
   },
+  "root": true,
   "rules": {}
 }
